@@ -1,61 +1,10 @@
-# 
-# Copyright (C) 2008, Brian Tanner
-# 
-#http://rl-glue-ext.googlecode.com/
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
-#  $Revision: 1011 $
-#  $Date: 2009-02-11 22:29:54 -0700 (Wed, 11 Feb 2009) $
-#  $Author: brian@tannerpages.com $
-#  $HeadURL: http://rl-library.googlecode.com/svn/trunk/projects/packages/examples/mines-sarsa-python/sample_sarsa_agent.py $
-
-import random
-import sys
-import copy
-import pickle
-from rlglue.agent.Agent import Agent
-from rlglue.agent import AgentLoader as AgentLoader
-from rlglue.types import Action
-from rlglue.types import Observation
-from rlglue.utils import TaskSpecVRLGLUE3
-from random import Random
-
-
-
-# This is a very simple Sarsa agent for discrete-action, discrete-state
-# environments.  It uses epsilon-greedy exploration.
-# 
-# We've made a decision to store the previous action and observation in 
-# their raw form, as structures.  This code could be simplified and you
-# could store them just as ints.
-
-
-# TO USE THIS Agent [order doesn't matter]
-# NOTE: I'm assuming the Python codec is installed an is in your Python path
-#   -  Start the rl_glue executable socket server on your computer
-#   -  Run the SampleMinesEnvironment and SampleExperiment from this or a
-#   different codec (Matlab, Python, Java, C, Lisp should all be fine)
-#   -  Start this agent like:
-#   $> python sample_sarsa_agent.py
-
 class sarsa_agent(Agent):
 	randGenerator=Random()
 	lastAction=Action()
 	lastObservation=Observation()
-	sarsa_stepsize = 0.1
+	sarsa_stepsize = 0.5
 	sarsa_epsilon = 0.1
-	sarsa_gamma = 0.9
+	sarsa_gamma = 1.0
 	numStates = 0
 	numActions = 0
 	value_function = None
@@ -87,6 +36,8 @@ class sarsa_agent(Agent):
 		self.lastObservation=Observation()
 		
 	def egreedy(self, state):
+		maxIndex=0
+		a=1
 		if not self.exploringFrozen and self.randGenerator.random()<self.sarsa_epsilon:
 			return self.randGenerator.randint(0,self.numActions-1)
 

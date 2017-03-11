@@ -1,3 +1,24 @@
+# # 
+# # Copyright (C) 2009, Brian Tanner
+# # 
+# #http://rl-glue-ext.googlecode.com/
+# #
+# # Licensed under the Apache License, Version 2.0 (the "License")
+# # you may not use this file except in compliance with the License.
+# # You may obtain a copy of the License at
+# #
+# #     http://www.apache.org/licenses/LICENSE-2.0
+# #
+# # Unless required by applicable law or agreed to in writing, software
+# # distributed under the License is distributed on an "AS IS" BASIS,
+# # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# # See the License for the specific language governing permissions and
+# # limitations under the License.
+# #
+# #  $Revision: 999 $
+# #  $Date: 2009-02-09 09:39:12 -0700 (Mon, 09 Feb 2009) $
+# #  $Author: brian@tannerpages.com $
+# #  $HeadURL: http://rl-library.googlecode.com/svn/trunk/projects/packages/examples/mines-sarsa-python/sample_mines_environment.py $
 
 import random
 import sys
@@ -7,21 +28,21 @@ from rlglue.types import Observation
 from rlglue.types import Action
 from rlglue.types import Reward_observation_terminal
 
-# This is a very simple discrete-state, episodic grid world that has 
-# exploding mines in it.  If the agent steps on a mine, the episode
-# ends with a large negative reward.
-# 
-# The reward per step is -1, with +10 for exiting the game successfully
-# and -100 for stepping on a mine.
+# # This is a very simple discrete-state, episodic grid world that has 
+# # exploding mines in it.  If the agent steps on a mine, the episode
+# # ends with a large negative reward.
+# # 
+# # The reward per step is -1, with +10 for exiting the game successfully
+# # and -100 for stepping on a mine.
 
 
-# TO USE THIS Environment [order doesn't matter]
-# NOTE: I'm assuming the Python codec is installed an is in your Python path
-#   -  Start the rl_glue executable socket server on your computer
-#   -  Run the SampleSarsaAgent and SampleExperiment from this or a
-#   different codec (Matlab, Python, Java, C, Lisp should all be fine)
-#   -  Start this environment like:
-#   $> python sample_mines_environment.py
+# # TO USE THIS Environment [order doesn't matter]
+# # NOTE: I'm assuming the Python codec is installed an is in your Python path
+# #   -  Start the rl_glue executable socket server on your computer
+# #   -  Run the SampleSarsaAgent and SampleExperiment from this or a
+# #   different codec (Matlab, Python, Java, C, Lisp should all be fine)
+# #   -  Start this environment like:
+# #   $> python sample_mines_environment.py
 
 class puddle_environment(Environment):
 	WORLD_FREE = 0
@@ -58,8 +79,8 @@ class puddle_environment(Environment):
 		# return "VERSION RL-Glue-3.0 PROBLEMTYPE episodic DISCOUNTFACTOR 1 OBSERVATIONS INTS (0 168) ACTIONS INTS (0 3) REWARDS (-3.0 10.0) EXTRA SampleMinesEnvironment(C/C++) by Brian Tanner."
 
 		return "VERSION RL-Glue-3.0 PROBLEMTYPE episodic DISCOUNTFACTOR 0.9 OBSERVATIONS INTS (0 195) ACTIONS INTS (0 3) REWARDS (-100.0 10.0) EXTRA SampleMinesEnvironment(C/C++) by Brian Tanner."	
-
-	def env_start(self): #random starting states out of the given 4 
+	
+	def env_start(self):
 		if self.fixedStartState:
 			stateValid=self.setAgentState(self.startRow,self.startCol)
 			if not stateValid:
@@ -88,6 +109,7 @@ class puddle_environment(Environment):
 		returnRO.r=self.calculateReward()
 		returnRO.o=theObs
 		returnRO.terminal=self.checkCurrentTerminal()
+
 		return returnRO
 
 	def env_cleanup(self):
@@ -123,8 +145,8 @@ class puddle_environment(Environment):
 	def setAgentState(self,row, col):
 		self.agentRow=row
 		self.agentCol=col
-
 		return self.checkValid(row,col) and not self.checkTerminal(row,col)
+
 
 	def setRandomState(self): # Random states at (6,1) (7,1) (11,1) (13,1) with equal probability
 		startState = self.randGenerator.randint(1,4)
@@ -142,8 +164,8 @@ class puddle_environment(Environment):
 			startCol = 1
 		print "(%d,%d)"%(startRow,startCol);		
 		self.setAgentState(startRow,startCol)
-		self.printState();
-		
+
+
 	def checkValid(self,row, col):
 		valid=False
 		numRows=len(self.map)
@@ -155,7 +177,7 @@ class puddle_environment(Environment):
 		return valid
 
 	def checkTerminal(self,row,col):
-		if (self.map[row][col] == self.WORLD_GOAL ):
+		if (self.map[row][col] == self.WORLD_GOAL):
 			return True
 		return False
 
@@ -166,8 +188,6 @@ class puddle_environment(Environment):
 		numRows=len(self.map)
 		return self.agentCol * numRows + self.agentRow
 
-
-
 	def updatePosition(self, theAction): # Introduce Stochasticity 
 		# Moves in intended direction with Pr = 0.9 and 0.1/3 in each of the other directions
 		newRow = self.agentRow;
@@ -177,11 +197,11 @@ class puddle_environment(Environment):
 		actList = [0,1,2,3];
 		
 		PrControl = self.randGenerator.uniform(0,1);
-		PrWesterly = self.randGenerator.uniform(0,1);
+		# PrWesterly = self.randGenerator.uniform(0,1);
 		# Create a flag which checks whether to move in the intended direction or not
 		#If this value is less than or equal to 0.9 then moveFlag is true. False otherwise 
 		moveFlag = True if PrControl <=0.9 else False ;
-		windFlag = True if PrWesterly <0.5 else False ;
+		# windFlag = True if PrWesterly <=1 else False ;
 		if moveFlag == False:
 			del(actList[theAction]);
 			Pr = self.randGenerator.uniform(0,0.1)
@@ -204,8 +224,8 @@ class puddle_environment(Environment):
 		if (theAction == 3 ):#move right
 			newRow = self.agentRow + 1;
 
-		if (windFlag == True):#move right
-			newRow = newRow + 1;
+		# if (windFlag == True):#move right
+		# 	newRow = newRow + 1;
 
 
 		#Check if new position is out of bounds or inside an obstacle 
@@ -214,6 +234,7 @@ class puddle_environment(Environment):
 			self.agentRow = newRow;
 			self.agentCol = newCol;
 		# self.printState()
+
 
 	def calculateReward(self):
 		# WORLD_PUDDLE1 = 2
@@ -228,6 +249,8 @@ class puddle_environment(Environment):
 		if(self.map[self.agentRow][self.agentCol] == self.WORLD_PUDDLE3):
 			return -3.0;			
 		return 0.0;
+		
+		
 		
 	def printState(self):
 		numRows=len(self.map)
