@@ -162,7 +162,7 @@ class puddle_environment(Environment):
 		elif startState ==4:
 			startRow = 12
 			startCol = 1
-		print "(%d,%d)"%(startRow,startCol);		
+		# print "(%d,%d)"%(startRow,startCol);		
 		self.setAgentState(startRow,startCol)
 
 

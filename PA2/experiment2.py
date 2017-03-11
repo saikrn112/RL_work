@@ -47,7 +47,7 @@ def Startexperiment():
 
 
 RLGlue.RL_init()
-print "Starting SARSA on Puddle World \n-------------------------------------------------------------------------\n"
+print "\nStarting SARSA on Puddle World \n-------------------------------------------------------------------------\n"
 print "Trails will be conducted for 10 runs.\n"
 print "Episode\t\tReturn\t\tSteps\n-------------------------------------------------------------------------"
 
