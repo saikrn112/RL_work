@@ -1,3 +1,4 @@
+
 import random
 import sys
 from rlglue.environment.Environment import Environment
@@ -25,27 +26,40 @@ from rlglue.types import Reward_observation_terminal
 class puddle_environment(Environment):
 	WORLD_FREE = 0
 	WORLD_OBSTACLE = 1
-	WORLD_MINE = 2 
-	WORLD_GOAL = 3
+	WORLD_PUDDLE1 = 2 
+	WORLD_PUDDLE2 = 3
+	WORLD_PUDDLE3 = 4  
+	WORLD_GOAL = 5
 	randGenerator=random.Random()
 	fixedStartState=False
-	startRow=1
+	startRow=1 # Start states are at (6,1) (7,1) (11,1) (12,1) #with python encoding
 	startCol=1
 	
 	currentState=10
 	def env_init(self):
 	    
-		self.map=[  		[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-		                    [1, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-		                    [1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-		                    [1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 1, 1],
-		                    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 1],
-		                    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]
+		self.map=[  		[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+		                    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 1],
+		                    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+		                    [1, 0, 0, 0, 2, 2, 2, 2, 2, 2, 0, 0, 0, 1],
+		                    [1, 0, 0, 0, 2, 3, 3, 3, 3, 2, 0, 0, 0, 1],
+		                    [1, 0, 0, 0, 2, 3, 4, 4, 3, 2, 0, 0, 0, 1],
+		                    [1, 0, 0, 0, 2, 3, 4, 3, 3, 2, 0, 0, 0, 1],
+		                    [1, 0, 0, 0, 2, 3, 4, 3, 2, 2, 0, 0, 0, 1],
+		                    [1, 0, 0, 0, 2, 3, 3, 3, 2, 0, 0, 0, 0, 1],
+		                    [1, 0, 0, 0, 2, 2, 2, 2, 2, 0, 0, 0, 0, 1],
+		                    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+		                    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+		                    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+		                    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]
+
 
 		#The Python task spec parser is not yet able to build task specs programmatically
-		return "VERSION RL-Glue-3.0 PROBLEMTYPE episodic DISCOUNTFACTOR 1 OBSERVATIONS INTS (0 107) ACTIONS INTS (0 3) REWARDS (-100.0 10.0) EXTRA SampleMinesEnvironment(C/C++) by Brian Tanner."
-	
-	def env_start(self):
+		# return "VERSION RL-Glue-3.0 PROBLEMTYPE episodic DISCOUNTFACTOR 1 OBSERVATIONS INTS (0 168) ACTIONS INTS (0 3) REWARDS (-3.0 10.0) EXTRA SampleMinesEnvironment(C/C++) by Brian Tanner."
+
+		return "VERSION RL-Glue-3.0 PROBLEMTYPE episodic DISCOUNTFACTOR 0.9 OBSERVATIONS INTS (0 195) ACTIONS INTS (0 3) REWARDS (-100.0 10.0) EXTRA SampleMinesEnvironment(C/C++) by Brian Tanner."	
+
+	def env_start(self): #random starting states out of the given 4 
 		if self.fixedStartState:
 			stateValid=self.setAgentState(self.startRow,self.startCol)
 			if not stateValid:
@@ -74,7 +88,6 @@ class puddle_environment(Environment):
 		returnRO.r=self.calculateReward()
 		returnRO.o=theObs
 		returnRO.terminal=self.checkCurrentTerminal()
-
 		return returnRO
 
 	def env_cleanup(self):
@@ -113,16 +126,24 @@ class puddle_environment(Environment):
 
 		return self.checkValid(row,col) and not self.checkTerminal(row,col)
 
-	def setRandomState(self):
-		numRows=len(self.map)
-		numCols=len(self.map[0])
-		startRow=self.randGenerator.randint(0,numRows-1)
-		startCol=self.randGenerator.randint(0,numCols-1)
-
-		while not self.setAgentState(startRow,startCol):
-			startRow=self.randGenerator.randint(0,numRows-1)
-			startCol=self.randGenerator.randint(0,numCols-1)
-
+	def setRandomState(self): # Random states at (6,1) (7,1) (11,1) (13,1) with equal probability
+		startState = self.randGenerator.randint(1,4)
+		if startState == 1:
+			startRow = 6
+			startCol = 1
+		elif startState ==2:
+			startRow = 7
+			startCol = 1
+		elif startState ==3:
+			startRow = 11
+			startCol = 1
+		elif startState ==4:
+			startRow = 12
+			startCol = 1
+		print "(%d,%d)"%(startRow,startCol);		
+		self.setAgentState(startRow,startCol)
+		self.printState();
+		
 	def checkValid(self,row, col):
 		valid=False
 		numRows=len(self.map)
@@ -134,7 +155,7 @@ class puddle_environment(Environment):
 		return valid
 
 	def checkTerminal(self,row,col):
-		if (self.map[row][col] == self.WORLD_GOAL or self.map[row][col] == self.WORLD_MINE):
+		if (self.map[row][col] == self.WORLD_GOAL ):
 			return True
 		return False
 
@@ -147,11 +168,30 @@ class puddle_environment(Environment):
 
 
 
-	def updatePosition(self, theAction):
-		# When the move would result in hitting an obstacles, the agent simply doesn't move 
+	def updatePosition(self, theAction): # Introduce Stochasticity 
+		# Moves in intended direction with Pr = 0.9 and 0.1/3 in each of the other directions
 		newRow = self.agentRow;
 		newCol = self.agentCol;
 
+		# Create a list of actions 
+		actList = [0,1,2,3];
+		
+		PrControl = self.randGenerator.uniform(0,1);
+		PrWesterly = self.randGenerator.uniform(0,1);
+		# Create a flag which checks whether to move in the intended direction or not
+		#If this value is less than or equal to 0.9 then moveFlag is true. False otherwise 
+		moveFlag = True if PrControl <=0.9 else False ;
+		windFlag = True if PrWesterly <0.5 else False ;
+		if moveFlag == False:
+			del(actList[theAction]);
+			Pr = self.randGenerator.uniform(0,0.1)
+			if Pr <=0.033:
+				theAction = actList[0];
+			elif Pr <= 0.066:
+				theAction = actList[1];
+			elif Pr <=0.1:
+				theAction = actList[2];
+		
 		if (theAction == 0):#move down
 			newCol = self.agentCol - 1;
 
@@ -161,47 +201,64 @@ class puddle_environment(Environment):
 		if (theAction == 2):#move left
 			newRow = self.agentRow - 1;
 
-		if (theAction == 3):#move right
+		if (theAction == 3 ):#move right
 			newRow = self.agentRow + 1;
 
+		if (windFlag == True):#move right
+			newRow = newRow + 1;
+
+
 		#Check if new position is out of bounds or inside an obstacle 
+		# When the move would result in hitting an obstacles, the agent simply doesn't move with Pr 0.9 
 		if(self.checkValid(newRow,newCol)):
 			self.agentRow = newRow;
 			self.agentCol = newCol;
+		# self.printState()
 
 	def calculateReward(self):
+		# WORLD_PUDDLE1 = 2
+		# WORLD_PUDDLE2 = 3
+		# WORLD_PUDDLE3 = 4  
 		if(self.map[self.agentRow][self.agentCol] == self.WORLD_GOAL):
 			return 10.0;
-		if(self.map[self.agentRow][self.agentCol] == self.WORLD_MINE):
-			return -100.0;
-		return -1.0;
+		if(self.map[self.agentRow][self.agentCol] == self.WORLD_PUDDLE1):
+			return -1.0;
+		if(self.map[self.agentRow][self.agentCol] == self.WORLD_PUDDLE2):
+			return -2.0;
+		if(self.map[self.agentRow][self.agentCol] == self.WORLD_PUDDLE3):
+			return -3.0;			
+		return 0.0;
 		
 	def printState(self):
 		numRows=len(self.map)
 		numCols=len(self.map[0])
 		print "Agent is at: "+str(self.agentRow)+","+str(self.agentCol)
-		print "Columns:0-10                10-17"
+		print "Columns:0-10                10-13"
 		print "Col    ",
 		for col in range(0,numCols):
 			print col%10,
 			
 		for row in range(0,numRows):
 			print
-			print "Row: "+str(row)+" ",
+			print "Row: "+str(row%10)+" ",
 			for col in range(0,numCols):
 				if self.agentRow==row and self.agentCol==col:
 					print "A",
 				else:
 					if self.map[row][col] == self.WORLD_GOAL:
 						print "G",
-					if self.map[row][col] == self.WORLD_MINE:
-						print "M",
+					if self.map[row][col] == self.WORLD_PUDDLE1:
+						print "1",
+					if self.map[row][col] == self.WORLD_PUDDLE2:
+						print "2",
+					if self.map[row][col] == self.WORLD_PUDDLE3:
+						print "3",
 					if self.map[row][col] == self.WORLD_OBSTACLE:
-						print "*",
+						print "*",						
 					if self.map[row][col] == self.WORLD_FREE:
 						print " ",
 		print
 		
 
 if __name__=="__main__":
-	EnvironmentLoader.loadEnvironment(mines_environment())
+	EnvironmentLoader.loadEnvironment(puddle_environment())
