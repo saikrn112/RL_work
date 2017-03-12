@@ -16,7 +16,7 @@ class sarsa_agent(Agent):
 	lastObservation=Observation()
 	sarsa_stepsize = 0.5
 	sarsa_epsilon = 0.1
-	sarsa_gamma = 1.0
+	sarsa_gamma = 0.9
 	numStates = 0
 	numActions = 0
 	value_function = None

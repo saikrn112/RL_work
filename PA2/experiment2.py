@@ -7,25 +7,43 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 def offlineDemo():
-	statistics=[];
+	results=[];
+	avgsteps= [];
+	avgreward=[];
 	episodeResult=Startexperiment();
-	printScore(0,episodeResult);
-	statistics.append(episodeResult);
-	episodes = 1000	
+	printScore(0,0,episodeResult);
+	results.append(episodeResult);
+	episodes = 10
 	n = np.arange(1,episodes+2,1);
 
-	for j in range(0,1): # 50 runs 
+	for j in range(0,2): # 50 runs 
+		RLGlue.RL_cleanup();
 		for i in range(0,episodes): # Let's try 100 episodes for learning 
 			RLGlue.RL_env_message("set-random-start-state");
 			episodeResult=Startexperiment();
-			printScore((i+1),episodeResult);
-			statistics.append(episodeResult);
+			printScore((j+1),(i+1),episodeResult);
+			results.append(episodeResult);
+		avgsteps.append([x[1] for  x in results])
+		avgreward.append([x[0] for  x in results])
+	
+	avgsteps = np.mean(avgsteps,0)
+	plt.plot(n,avgsteps);		
+	plt.xlabel('Episodes')
+	plt.ylabel('Average steps ')
+	plt.title('Average Reward per episode')
+	plt.grid(True)
+	plt.show()
 
-	plt.plot(n,[x[0] for  x in statistics]);		
+	avgreward = np.mean(avgreward,0);
+	plt.plot(n,avgreward);		
+	plt.xlabel('Episodes')
+	plt.ylabel('Average Reward ')
+	plt.title('Average Reward per episode')
+	plt.grid(True)
 	plt.show()
 			
-def printScore(afterEpisodes, score_tuple):
-	print "%d\t\t%.2f\t\t%.1f" % (afterEpisodes, score_tuple[0],score_tuple[1])
+def printScore(run,afterEpisodes, score_tuple):
+	print "%d\t\t%d\t\t%.2f\t\t%.1f" % (run, afterEpisodes, score_tuple[0],score_tuple[1])
 
 def Startexperiment():
 	sum=0;
@@ -36,7 +54,7 @@ def Startexperiment():
 	avgsteps = 0;
 	
 	for i in range(0,n): # n trials			
-		RLGlue.RL_episode(0) # 0 indicates infinite steps
+		RLGlue.RL_episode(100000) # 0 indicates infinite steps
 		this_return=RLGlue.RL_return();
 		steps+=RLGlue.RL_num_steps();
 		sum+=this_return;
@@ -53,11 +71,13 @@ print "Episode\t\tReturn\t\tSteps\n---------------------------------------------
 
 # RLGlue.RL_agent_message("set-start-state 6 1")
 
-offlineDemo()
+# offlineDemo()
 
-RLGlue.RL_agent_message("save_policy results.dat");
+# RLGlue.RL_agent_message("save_policy results.dat");
 
-# input ("waiting for the key")
-
+while True:
+	a = input ("waiting for the key: ")
+	if (a==1):
+		RLGlue.RL_env_message("set-start-state 1 0 ")
 RLGlue.RL_cleanup();
 print "\nProgram Complete."

@@ -55,30 +55,30 @@ class puddle_environment(Environment):
 	fixedStartState=False
 	startRow=1 # Start states are at (6,1) (7,1) (11,1) (12,1) #with python encoding
 	startCol=1
-	
+	agentRow = 1;
+	agentCol = 1; 
 	currentState=10
 	def env_init(self):
 	    
-		self.map=[  		[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-		                    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 1],
-		                    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-		                    [1, 0, 0, 0, 2, 2, 2, 2, 2, 2, 0, 0, 0, 1],
-		                    [1, 0, 0, 0, 2, 3, 3, 3, 3, 2, 0, 0, 0, 1],
-		                    [1, 0, 0, 0, 2, 3, 4, 4, 3, 2, 0, 0, 0, 1],
-		                    [1, 0, 0, 0, 2, 3, 4, 3, 3, 2, 0, 0, 0, 1],
-		                    [1, 0, 0, 0, 2, 3, 4, 3, 2, 2, 0, 0, 0, 1],
-		                    [1, 0, 0, 0, 2, 3, 3, 3, 2, 0, 0, 0, 0, 1],
-		                    [1, 0, 0, 0, 2, 2, 2, 2, 2, 0, 0, 0, 0, 1],
-		                    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-		                    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-		                    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-		                    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]
+		self.map=[          [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5],
+		                    [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		                    [ 0, 0, 0, 2, 2, 2, 2, 2, 2, 0, 0, 0],
+		                    [ 0, 0, 0, 2, 3, 3, 3, 3, 2, 0, 0, 0],
+		                    [ 0, 0, 0, 2, 3, 4, 4, 3, 2, 0, 0, 0],
+		                    [ 0, 0, 0, 2, 3, 4, 3, 3, 2, 0, 0, 0],
+		                    [ 0, 0, 0, 2, 3, 4, 3, 2, 2, 0, 0, 0],
+		                    [ 0, 0, 0, 2, 3, 3, 3, 2, 0, 0, 0, 0],
+		                    [ 0, 0, 0, 2, 2, 2, 2, 2, 0, 0, 0, 0],
+		                    [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		                    [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		                    [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]],
+		                    
 
 
 		#The Python task spec parser is not yet able to build task specs programmatically
 		# return "VERSION RL-Glue-3.0 PROBLEMTYPE episodic DISCOUNTFACTOR 1 OBSERVATIONS INTS (0 168) ACTIONS INTS (0 3) REWARDS (-3.0 10.0) EXTRA SampleMinesEnvironment(C/C++) by Brian Tanner."
 
-		return "VERSION RL-Glue-3.0 PROBLEMTYPE episodic DISCOUNTFACTOR 0.9 OBSERVATIONS INTS (0 195) ACTIONS INTS (0 3) REWARDS (-100.0 10.0) EXTRA SampleMinesEnvironment(C/C++) by Brian Tanner."	
+		return "VERSION RL-Glue-3.0 PROBLEMTYPE episodic DISCOUNTFACTOR 0.9 OBSERVATIONS INTS (0 143) ACTIONS INTS (0 3) REWARDS (-100.0 10.0) EXTRA SampleMinesEnvironment(C/C++) by Brian Tanner."	
 	
 	def env_start(self):
 		if self.fixedStartState:
@@ -128,8 +128,15 @@ class puddle_environment(Environment):
 		# Action: Set flag to do fixed starting states (row=X, col=Y)
 		if inMessage.startswith("set-start-state"):
 			splitString=inMessage.split(" ");
-			self.startRow=int(splitString[1]);
-			self.startCol=int(splitString[2]);
+			# self.startRow=int(splitString[1]);
+			# self.startCol=int(splitString[2]);
+			newcol = self.agentCol;
+			newcol +=1;
+			newRow = self.agentRow;
+			if(checkValid(newRow,newCol)):
+				self.agentCol = newcol;
+				self.agentRow = newRow;
+			printState();
 			self.fixedStartState=True;
 			return "Message understood.  Using fixed start state.";
 
@@ -151,17 +158,17 @@ class puddle_environment(Environment):
 	def setRandomState(self): # Random states at (6,1) (7,1) (11,1) (13,1) with equal probability
 		startState = self.randGenerator.randint(1,4)
 		if startState == 1:
-			startRow = 6
-			startCol = 1
+			startRow = 5
+			startCol = 0
 		elif startState ==2:
-			startRow = 7
-			startCol = 1
+			startRow = 6
+			startCol = 0
 		elif startState ==3:
-			startRow = 11
-			startCol = 1
+			startRow = 10
+			startCol = 0
 		elif startState ==4:
-			startRow = 12
-			startCol = 1
+			startRow = 11
+			startCol = 0
 		# print "(%d,%d)"%(startRow,startCol);		
 		self.setAgentState(startRow,startCol)
 
@@ -171,7 +178,7 @@ class puddle_environment(Environment):
 		numRows=len(self.map)
 		numCols=len(self.map[0])
 
-		if(row < numRows and row >= 0 and col < numCols and col >= 0):
+		if(row <= numRows and row >= 0 and col <= numCols and col >= 0):
 			if self.map[row][col] != self.WORLD_OBSTACLE:
 				valid=True
 		return valid
@@ -197,11 +204,11 @@ class puddle_environment(Environment):
 		actList = [0,1,2,3];
 		
 		PrControl = self.randGenerator.uniform(0,1);
-		# PrWesterly = self.randGenerator.uniform(0,1);
+		PrWesterly = self.randGenerator.uniform(0,1);
 		# Create a flag which checks whether to move in the intended direction or not
 		#If this value is less than or equal to 0.9 then moveFlag is true. False otherwise 
 		moveFlag = True if PrControl <=0.9 else False ;
-		# windFlag = True if PrWesterly <=1 else False ;
+		windFlag = True if PrWesterly <0.5 else False ;
 		if moveFlag == False:
 			del(actList[theAction]);
 			Pr = self.randGenerator.uniform(0,0.1)
@@ -222,11 +229,14 @@ class puddle_environment(Environment):
 			newRow = self.agentRow - 1;
 
 		if (theAction == 3 ):#move right
+			print (newRow,newCol)
 			newRow = self.agentRow + 1;
+			print (newRow,newCol)
 
-		# if (windFlag == True):#move right
-		# 	newRow = newRow + 1;
-
+		if (windFlag == True):#move right
+			print (newRow,newCol)
+			newRow = newRow + 1;
+			print (newRow,newCol)
 
 		#Check if new position is out of bounds or inside an obstacle 
 		# When the move would result in hitting an obstacles, the agent simply doesn't move with Pr 0.9 
